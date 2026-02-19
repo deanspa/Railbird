@@ -1,19 +1,23 @@
-﻿using Railbird.Core.Hrs.Validation;
+using Railbird.Core.Hrs.Validation;
 using Xunit;
 
 namespace Railbird.Core.Tests;
 
 public sealed class SchemaValidationTests
 {
-    [Theory]
-    [InlineData("HAND_RECORDING_EXAMPLE_1.json")]
-    [InlineData("HAND_RECORDING_EXAMPLE_2.json")]
-    [InlineData("HAND_RECORDING_EXAMPLE_3.json")]
-    public void ExampleHandsValidate(string fileName)
+    [Fact]
+    public void ExampleHandsValidate()
     {
-        var json = File.ReadAllText(Path.Combine(FindRepoRoot(), "examples", "hands", "v1", fileName));
-        var result = HrsValidator.Validate(json);
-        Assert.True(result.IsSuccess, string.Join("\n", result.Errors));
+        var examplesDir = Path.Combine(FindRepoRoot(), "examples", "hands", "v1");
+        var files = Directory.GetFiles(examplesDir, "*.json", SearchOption.TopDirectoryOnly);
+        Assert.NotEmpty(files);
+
+        foreach (var file in files)
+        {
+            var json = File.ReadAllText(file);
+            var result = HrsValidator.Validate(json);
+            Assert.True(result.IsSuccess, $"{Path.GetFileName(file)}: {string.Join("\n", result.Errors)}");
+        }
     }
 
     [Fact]

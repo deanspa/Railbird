@@ -1,0 +1,288 @@
+{
+  "hand_id": "phh-hand_03",
+  "game": "NLHE",
+  "max_seats": 6,
+  "timestamp_utc": "2000-01-01T00:00:03Z",
+  "table_name": null,
+  "stakes": {
+    "small_blind": 0.5,
+    "big_blind": 1,
+    "currency": "GBP"
+  },
+  "button_seat": 1,
+  "source": null,
+  "players": [
+    {
+      "seat_no": 1,
+      "player_id": "P1",
+      "display_name": "Player-Seat-1",
+      "starting_stack": 100,
+      "is_hero": true
+    },
+    {
+      "seat_no": 2,
+      "player_id": "P2",
+      "display_name": "Player-Seat-2",
+      "starting_stack": 100,
+      "is_hero": false
+    },
+    {
+      "seat_no": 3,
+      "player_id": "P3",
+      "display_name": "Player-Seat-3",
+      "starting_stack": 100,
+      "is_hero": false
+    },
+    {
+      "seat_no": 4,
+      "player_id": "P4",
+      "display_name": "Player-Seat-4",
+      "starting_stack": 100,
+      "is_hero": false
+    },
+    {
+      "seat_no": 5,
+      "player_id": "P5",
+      "display_name": "Player-Seat-5",
+      "starting_stack": 100,
+      "is_hero": false
+    },
+    {
+      "seat_no": 6,
+      "player_id": "P6",
+      "display_name": "Player-Seat-6",
+      "starting_stack": 100,
+      "is_hero": false
+    }
+  ],
+  "events": [
+    {
+      "seq": 1,
+      "street": "PREFLOP",
+      "type": "DEAL_HOLE",
+      "actor_seat": 1,
+      "amount": null,
+      "to_amount": null,
+      "cards": [
+        "9s",
+        "9d"
+      ],
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    },
+    {
+      "seq": 2,
+      "street": "PREFLOP",
+      "type": "BET",
+      "actor_seat": 4,
+      "amount": 3,
+      "to_amount": null,
+      "cards": null,
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    },
+    {
+      "seq": 3,
+      "street": "PREFLOP",
+      "type": "RAISE",
+      "actor_seat": 5,
+      "amount": 9,
+      "to_amount": 9,
+      "cards": null,
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    },
+    {
+      "seq": 4,
+      "street": "PREFLOP",
+      "type": "FOLD",
+      "actor_seat": 6,
+      "amount": null,
+      "to_amount": null,
+      "cards": null,
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    },
+    {
+      "seq": 5,
+      "street": "PREFLOP",
+      "type": "FOLD",
+      "actor_seat": 1,
+      "amount": null,
+      "to_amount": null,
+      "cards": null,
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    },
+    {
+      "seq": 6,
+      "street": "PREFLOP",
+      "type": "CALL",
+      "actor_seat": 2,
+      "amount": 9,
+      "to_amount": null,
+      "cards": null,
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    },
+    {
+      "seq": 7,
+      "street": "PREFLOP",
+      "type": "FOLD",
+      "actor_seat": 3,
+      "amount": null,
+      "to_amount": null,
+      "cards": null,
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    },
+    {
+      "seq": 8,
+      "street": "PREFLOP",
+      "type": "CALL",
+      "actor_seat": 4,
+      "amount": 6,
+      "to_amount": null,
+      "cards": null,
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    },
+    {
+      "seq": 9,
+      "street": "FLOP",
+      "type": "DEAL_FLOP",
+      "actor_seat": null,
+      "amount": null,
+      "to_amount": null,
+      "cards": [
+        "2h",
+        "5h",
+        "9c"
+      ],
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    },
+    {
+      "seq": 10,
+      "street": "FLOP",
+      "type": "CHECK",
+      "actor_seat": 2,
+      "amount": null,
+      "to_amount": null,
+      "cards": null,
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    },
+    {
+      "seq": 11,
+      "street": "FLOP",
+      "type": "BET",
+      "actor_seat": 4,
+      "amount": 12,
+      "to_amount": null,
+      "cards": null,
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    },
+    {
+      "seq": 12,
+      "street": "FLOP",
+      "type": "CALL",
+      "actor_seat": 2,
+      "amount": 12,
+      "to_amount": null,
+      "cards": null,
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    },
+    {
+      "seq": 13,
+      "street": "TURN",
+      "type": "DEAL_TURN",
+      "actor_seat": null,
+      "amount": null,
+      "to_amount": null,
+      "cards": [
+        "Kd"
+      ],
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    },
+    {
+      "seq": 14,
+      "street": "TURN",
+      "type": "CHECK",
+      "actor_seat": 2,
+      "amount": null,
+      "to_amount": null,
+      "cards": null,
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    },
+    {
+      "seq": 15,
+      "street": "TURN",
+      "type": "CHECK",
+      "actor_seat": 4,
+      "amount": null,
+      "to_amount": null,
+      "cards": null,
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    },
+    {
+      "seq": 16,
+      "street": "RIVER",
+      "type": "DEAL_RIVER",
+      "actor_seat": null,
+      "amount": null,
+      "to_amount": null,
+      "cards": [
+        "3s"
+      ],
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    },
+    {
+      "seq": 17,
+      "street": "RIVER",
+      "type": "CHECK",
+      "actor_seat": 2,
+      "amount": null,
+      "to_amount": null,
+      "cards": null,
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    },
+    {
+      "seq": 18,
+      "street": "RIVER",
+      "type": "CHECK",
+      "actor_seat": 4,
+      "amount": null,
+      "to_amount": null,
+      "cards": null,
+      "pot_after": null,
+      "actor_stack_after": null,
+      "note": null
+    }
+  ],
+  "outcome": null
+}

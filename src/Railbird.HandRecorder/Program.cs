@@ -1,7 +1,8 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text.Json;
 using Railbird.Core.Hrs.Models;
 using Railbird.Core.Hrs.Validation;
+using Railbird.Core.Rules;
 using Railbird.Storage.Db;
 using Railbird.Storage.Repos;
 
@@ -12,8 +13,8 @@ Console.WriteLine();
 var outputDir = Prompt.AskString("Output directory", "examples/hands/v1/generated", allowEmpty: false);
 Directory.CreateDirectory(outputDir);
 
-var handIdDefault = $"v1-hand-{DateTime.UtcNow:yyyyMMddHHmmss}";
-var handId = Prompt.AskString("Hand ID", handIdDefault, allowEmpty: false);
+var handIdDefault = HandId.Generate();
+var handId = Prompt.AskString($"Hand ID (format: {HandId.FormatDescription})", handIdDefault, allowEmpty: false);
 
 var timestampUtc = Prompt.AskString("Timestamp UTC (ISO 8601)", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"), allowEmpty: false);
 
@@ -21,10 +22,10 @@ var tableName = Prompt.AskString("Table name (optional)", "", allowEmpty: true);
 
 var smallBlind = Prompt.AskDecimal("Small blind", 0.5m, min: 0.01m);
 var bigBlind = Prompt.AskDecimal("Big blind", 1.0m, min: 0.01m);
-var currency = Prompt.AskString("Currency", "USD", allowEmpty: false);
+var currency = Prompt.AskString("Currency", "GBP", allowEmpty: false);
 
 var buttonSeat = Prompt.AskInt("Button seat (1-6)", 1, 1, 6);
-var playerCount = Prompt.AskInt("Number of players (2-6)", 2, 2, 6);
+var playerCount = Prompt.AskInt("Number of players (2-6)", 6, 2, 6);
 
 var seats = Enumerable.Range(1, playerCount).ToList();
 Console.WriteLine($"Using seats: {string.Join(", ", seats)}");
@@ -33,7 +34,7 @@ var heroSeat = Prompt.AskInt("Hero seat (choose from seats above)", seats[0], 1,
 var players = new List<Player>();
 foreach (var seat in seats)
 {
-    var nameDefault = $"P{seat}";
+    var nameDefault = $"Player-Seat-{seat}";
     var displayName = Prompt.AskString($"Display name for seat {seat}", nameDefault, allowEmpty: false);
     var startingStack = Prompt.AskDecimal($"Starting stack for seat {seat}", 100m, min: 0m);
 
@@ -47,27 +48,10 @@ foreach (var seat in seats)
     });
 }
 
-Console.WriteLine();
-Console.WriteLine("Scenario selection:");
-Console.WriteLine("1) Simple preflop raise + fold");
-Console.WriteLine("2) Showdown hand (flop/turn/river)");
-Console.WriteLine("3) All-in preflop");
-Console.WriteLine("4) Full coverage (all event types)");
-Console.WriteLine("5) Manual event entry");
-
-var scenarioChoice = Prompt.AskInt("Choose scenario (1-5)", 1, 1, 5);
-
 var builder = new HandBuilder(players);
-List<HandEvent> events = scenarioChoice switch
-{
-    1 => Scenarios.SimplePreflopFold(builder, buttonSeat, smallBlind, bigBlind, seats),
-    2 => Scenarios.ShowdownHand(builder, buttonSeat, smallBlind, bigBlind, seats),
-    3 => Scenarios.AllInPreflop(builder, buttonSeat, smallBlind, bigBlind, seats),
-    4 => Scenarios.FullCoverage(builder, buttonSeat, smallBlind, bigBlind, seats),
-    _ => Scenarios.Manual(builder, buttonSeat, smallBlind, bigBlind, seats)
-};
+List<HandEvent> events = RulesEngine.Run(builder, players, seats, buttonSeat, smallBlind, bigBlind, heroSeat);
 
-var outcome = OutcomeBuilder.BuildOutcome(players, builder.Pot, includeShownCardsDefault: scenarioChoice == 2);
+var outcome = OutcomeBuilder.BuildOutcome(players, builder.Pot, includeShownCardsDefault: false);
 
 var hand = new Hand
 {
@@ -126,6 +110,15 @@ if (importNow)
 
 Console.WriteLine("Done.");
 
+static class HandId
+{
+    public const string FormatDescription = "rb-v1-YYYYMMDD-HHMMSS-fff";
+
+    public static string Generate()
+    {
+        return $"rb-v1-{DateTime.UtcNow:yyyyMMdd-HHmmss-fff}";
+    }
+}
 static class Prompt
 {
     public static string AskString(string label, string defaultValue, bool allowEmpty)
@@ -269,6 +262,21 @@ static class Prompt
             }
 
             return seats;
+        }
+    }
+
+    public static int AskOption(string label, List<string> options, int defaultIndex = 0)
+    {
+        while (true)
+        {
+            Console.WriteLine(label);
+            for (var i = 0; i < options.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}) {options[i]}");
+            }
+
+            var choice = AskInt("Choose option", defaultIndex + 1, 1, options.Count);
+            return choice - 1;
         }
     }
 }
@@ -435,185 +443,168 @@ static class OutcomeBuilder
     }
 }
 
-static class Scenarios
+static class RulesEngine
 {
-    public static List<HandEvent> SimplePreflopFold(HandBuilder builder, int buttonSeat, decimal sb, decimal bb, List<int> seats)
+    public static List<HandEvent> Run(
+        HandBuilder builder,
+        List<Player> players,
+        List<int> seats,
+        int buttonSeat,
+        decimal sb,
+        decimal bb,
+        int heroSeat)
     {
         var events = new List<HandEvent>();
-        var sbSeat = seats[0];
-        var bbSeat = seats.Count > 1 ? seats[1] : seats[0];
+        var displayNames = players.ToDictionary(p => p.SeatNo, p => p.DisplayName);
+        var state = new NlheGameState(seats, buttonSeat, sb, bb, players.ToDictionary(p => p.SeatNo, p => p.StartingStack));
 
-        events.Add(builder.AddEvent(EventType.POST_SB, Street.PREFLOP, sbSeat, sb, null, null, null));
-        events.Add(builder.AddEvent(EventType.POST_BB, Street.PREFLOP, bbSeat, bb, null, null, null));
-        events.Add(builder.AddEvent(EventType.DEAL_HOLE, Street.PREFLOP, sbSeat, null, null, Prompt.AskCards("Hero hole cards", 2, 2), null));
-        events.Add(builder.AddEvent(EventType.RAISE, Street.PREFLOP, sbSeat, bb * 2, bb * 3, null, null));
-        events.Add(builder.AddEvent(EventType.FOLD, Street.PREFLOP, bbSeat, null, null, null, "Folded preflop"));
-        return events;
-    }
+        events.Add(builder.AddEvent(EventType.POST_SB, Street.PREFLOP, state.SmallBlindSeat, sb, null, null, null));
+        state.PostBlind(state.SmallBlindSeat, sb);
 
-    public static List<HandEvent> ShowdownHand(HandBuilder builder, int buttonSeat, decimal sb, decimal bb, List<int> seats)
-    {
-        var events = new List<HandEvent>();
-        var sbSeat = seats[0];
-        var bbSeat = seats.Count > 1 ? seats[1] : seats[0];
+        events.Add(builder.AddEvent(EventType.POST_BB, Street.PREFLOP, state.BigBlindSeat, bb, null, null, null));
+        state.PostBlind(state.BigBlindSeat, bb);
 
-        events.Add(builder.AddEvent(EventType.POST_SB, Street.PREFLOP, sbSeat, sb, null, null, null));
-        events.Add(builder.AddEvent(EventType.POST_BB, Street.PREFLOP, bbSeat, bb, null, null, null));
-        events.Add(builder.AddEvent(EventType.DEAL_HOLE, Street.PREFLOP, sbSeat, null, null, Prompt.AskCards("Hero hole cards", 2, 2), null));
-        events.Add(builder.AddEvent(EventType.CALL, Street.PREFLOP, sbSeat, bb, null, null, null));
-        events.Add(builder.AddEvent(EventType.CHECK, Street.PREFLOP, bbSeat, null, null, null, null));
+        var heroCards = Prompt.AskCards("Hero hole cards", 2, 2);
+        events.Add(builder.AddEvent(EventType.DEAL_HOLE, Street.PREFLOP, heroSeat, null, null, heroCards, null));
 
-        events.Add(builder.AddEvent(EventType.DEAL_FLOP, Street.FLOP, null, null, null, Prompt.AskCards("Flop cards", 3, 3), null));
-        events.Add(builder.AddEvent(EventType.BET, Street.FLOP, bbSeat, bb, null, null, null));
-        events.Add(builder.AddEvent(EventType.CALL, Street.FLOP, sbSeat, bb, null, null, null));
+        state.StartPreflop();
 
-        events.Add(builder.AddEvent(EventType.DEAL_TURN, Street.TURN, null, null, null, Prompt.AskCards("Turn card", 1, 1), null));
-        events.Add(builder.AddEvent(EventType.CHECK, Street.TURN, sbSeat, null, null, null, null));
-        events.Add(builder.AddEvent(EventType.CHECK, Street.TURN, bbSeat, null, null, null, null));
-
-        events.Add(builder.AddEvent(EventType.DEAL_RIVER, Street.RIVER, null, null, null, Prompt.AskCards("River card", 1, 1), null));
-        events.Add(builder.AddEvent(EventType.BET, Street.RIVER, sbSeat, bb, null, null, null));
-        events.Add(builder.AddEvent(EventType.CALL, Street.RIVER, bbSeat, bb, null, null, null));
-
-        return events;
-    }
-
-    public static List<HandEvent> AllInPreflop(HandBuilder builder, int buttonSeat, decimal sb, decimal bb, List<int> seats)
-    {
-        var events = new List<HandEvent>();
-        var sbSeat = seats[0];
-        var bbSeat = seats.Count > 1 ? seats[1] : seats[0];
-
-        events.Add(builder.AddEvent(EventType.POST_SB, Street.PREFLOP, sbSeat, sb, null, null, null));
-        events.Add(builder.AddEvent(EventType.POST_BB, Street.PREFLOP, bbSeat, bb, null, null, null));
-        events.Add(builder.AddEvent(EventType.DEAL_HOLE, Street.PREFLOP, sbSeat, null, null, Prompt.AskCards("Hero hole cards", 2, 2), null));
-
-        var allInAmount = Prompt.AskDecimal("All-in amount", bb * 20, min: bb);
-        events.Add(builder.AddEvent(EventType.ALL_IN, Street.PREFLOP, sbSeat, allInAmount, allInAmount, null, null));
-        events.Add(builder.AddEvent(EventType.CALL, Street.PREFLOP, bbSeat, allInAmount, null, null, null));
-
-        return events;
-    }
-
-    public static List<HandEvent> FullCoverage(HandBuilder builder, int buttonSeat, decimal sb, decimal bb, List<int> seats)
-    {
-        var events = new List<HandEvent>();
-        var sbSeat = seats[0];
-        var bbSeat = seats.Count > 1 ? seats[1] : seats[0];
-        var thirdSeat = seats.Count > 2 ? seats[2] : bbSeat;
-
-        var ante = Prompt.AskDecimal("Ante amount", 0.1m, min: 0m);
-        foreach (var seat in seats)
+        while (!state.IsHandOver)
         {
-            if (ante > 0m)
+            if (state.ShouldAdvanceStreet())
             {
-                events.Add(builder.AddEvent(EventType.POST_ANTE, Street.PREFLOP, seat, ante, null, null, null));
-            }
-        }
-
-        events.Add(builder.AddEvent(EventType.POST_SB, Street.PREFLOP, sbSeat, sb, null, null, null));
-        events.Add(builder.AddEvent(EventType.POST_BB, Street.PREFLOP, bbSeat, bb, null, null, null));
-        events.Add(builder.AddEvent(EventType.DEAL_HOLE, Street.PREFLOP, sbSeat, null, null, Prompt.AskCards("Hero hole cards", 2, 2), null));
-
-        events.Add(builder.AddEvent(EventType.RAISE, Street.PREFLOP, sbSeat, bb * 2, bb * 3, null, null));
-        events.Add(builder.AddEvent(EventType.CALL, Street.PREFLOP, bbSeat, bb * 2, null, null, null));
-
-        events.Add(builder.AddEvent(EventType.DEAL_FLOP, Street.FLOP, null, null, null, Prompt.AskCards("Flop cards", 3, 3), null));
-        events.Add(builder.AddEvent(EventType.CHECK, Street.FLOP, bbSeat, null, null, null, null));
-        events.Add(builder.AddEvent(EventType.BET, Street.FLOP, sbSeat, bb, null, null, null));
-        events.Add(builder.AddEvent(EventType.RAISE, Street.FLOP, bbSeat, bb, bb * 3, null, null));
-        events.Add(builder.AddEvent(EventType.CALL, Street.FLOP, sbSeat, bb * 2, null, null, null));
-
-        events.Add(builder.AddEvent(EventType.DEAL_TURN, Street.TURN, null, null, null, Prompt.AskCards("Turn card", 1, 1), null));
-        events.Add(builder.AddEvent(EventType.CHECK, Street.TURN, sbSeat, null, null, null, null));
-        events.Add(builder.AddEvent(EventType.CHECK, Street.TURN, bbSeat, null, null, null, null));
-
-        events.Add(builder.AddEvent(EventType.DEAL_RIVER, Street.RIVER, null, null, null, Prompt.AskCards("River card", 1, 1), null));
-        var allInAmount = Prompt.AskDecimal("All-in amount", bb * 10, min: bb);
-        events.Add(builder.AddEvent(EventType.ALL_IN, Street.RIVER, bbSeat, allInAmount, allInAmount, null, "All-in river bet"));
-        events.Add(builder.AddEvent(EventType.FOLD, Street.RIVER, sbSeat, null, null, null, "Folded to all-in"));
-
-        return events;
-    }
-
-    public static List<HandEvent> Manual(HandBuilder builder, int buttonSeat, decimal sb, decimal bb, List<int> seats)
-    {
-        var events = new List<HandEvent>();
-
-        var includePosts = Prompt.AskBool("Auto-add blinds (SB/BB)?", true);
-        if (includePosts)
-        {
-            var sbSeat = seats[0];
-            var bbSeat = seats.Count > 1 ? seats[1] : seats[0];
-            events.Add(builder.AddEvent(EventType.POST_SB, Street.PREFLOP, sbSeat, sb, null, null, null));
-            events.Add(builder.AddEvent(EventType.POST_BB, Street.PREFLOP, bbSeat, bb, null, null, null));
-        }
-
-        var includeDeal = Prompt.AskBool("Add DEAL_HOLE event for hero?", true);
-        if (includeDeal)
-        {
-            var heroSeat = seats[0];
-            events.Add(builder.AddEvent(EventType.DEAL_HOLE, Street.PREFLOP, heroSeat, null, null, Prompt.AskCards("Hero hole cards", 2, 2), null));
-        }
-
-        while (true)
-        {
-            Console.WriteLine();
-            Console.WriteLine("Add event type:");
-            var eventTypes = Enum.GetValues<EventType>().ToList();
-            for (var i = 0; i < eventTypes.Count; i++)
-            {
-                Console.WriteLine($"{i + 1}) {eventTypes[i]}");
+                if (!state.AdvanceStreet())
+                {
+                    break;
+                }
             }
 
-            var choice = Prompt.AskInt("Choose event type", 1, 1, eventTypes.Count);
-            var type = eventTypes[choice - 1];
-
-            var street = (Street)Prompt.AskInt("Street (1=PREFLOP,2=FLOP,3=TURN,4=RIVER,5=SHOWDOWN,6=SUMMARY)", 1, 1, 6) - 1;
-
-            int? actorSeat = null;
-            if (type != EventType.DEAL_FLOP && type != EventType.DEAL_TURN && type != EventType.DEAL_RIVER)
-            {
-                actorSeat = Prompt.AskInt("Actor seat (1-6)", seats[0], 1, 6);
-            }
-
-            decimal? amount = null;
-            decimal? toAmount = null;
-            if (type is EventType.POST_SB or EventType.POST_BB or EventType.POST_ANTE or EventType.BET or EventType.CALL or EventType.RAISE or EventType.ALL_IN)
-            {
-                amount = Prompt.AskDecimal("Amount", 0m, min: 0m);
-            }
-
-            if (type == EventType.RAISE || type == EventType.ALL_IN)
-            {
-                toAmount = Prompt.AskDecimal("To amount", amount ?? 0m, min: 0m);
-            }
-
-            List<string>? cards = null;
-            if (type == EventType.DEAL_HOLE)
-            {
-                cards = Prompt.AskCards("Hole cards", 2, 2);
-            }
-            else if (type == EventType.DEAL_FLOP)
-            {
-                cards = Prompt.AskCards("Flop cards", 3, 3);
-            }
-            else if (type == EventType.DEAL_TURN || type == EventType.DEAL_RIVER)
-            {
-                cards = Prompt.AskCards("Board card", 1, 1);
-            }
-
-            var note = Prompt.AskString("Note (optional)", "", allowEmpty: true);
-
-            events.Add(builder.AddEvent(type, street, actorSeat, amount, toAmount, cards, string.IsNullOrWhiteSpace(note) ? null : note));
-
-            if (!Prompt.AskBool("Add another event?", true))
+            if (state.IsHandOver)
             {
                 break;
             }
+
+            if (state.NeedsBoardDeal)
+            {
+                AddBoardDeal(events, builder, state.CurrentStreet);
+                state.MarkBoardDealt();
+                continue;
+            }
+
+            var nextActor = state.GetNextActor();
+            if (!nextActor.HasValue)
+            {
+                continue;
+            }
+
+            var actorSeat = nextActor.Value;
+            var stack = state.Stacks[actorSeat];
+            var committed = state.Committed[actorSeat];
+            var callAmount = Math.Max(0m, state.CurrentBet - committed);
+
+            var actions = state.GetLegalActions(actorSeat);
+            var labels = actions.Select(a => BuildLabel(a, state, actorSeat)).ToList();
+            var choiceIndex = Prompt.AskOption($"Action for seat {actorSeat} ({displayNames[actorSeat]})", labels);
+            var choice = actions[choiceIndex];
+
+            switch (choice)
+            {
+                case ActionKind.Check:
+                    events.Add(builder.AddEvent(EventType.CHECK, state.CurrentStreet, actorSeat, null, null, null, null));
+                    state.ApplyCheck(actorSeat);
+                    break;
+                case ActionKind.Fold:
+                    events.Add(builder.AddEvent(EventType.FOLD, state.CurrentStreet, actorSeat, null, null, null, null));
+                    state.ApplyFold(actorSeat);
+                    break;
+                case ActionKind.Call:
+                    var callContribution = Math.Min(callAmount, stack);
+                    events.Add(builder.AddEvent(EventType.CALL, state.CurrentStreet, actorSeat, callContribution, null, null, null));
+                    state.ApplyCall(actorSeat, callContribution, isAllIn: callContribution >= stack);
+                    break;
+                case ActionKind.Bet:
+                    var minBet = state.BigBlind;
+                    var betAmount = Prompt.AskDecimal($"Bet amount (min {minBet})", minBet, min: minBet);
+                    betAmount = Math.Min(betAmount, stack);
+                    events.Add(builder.AddEvent(EventType.BET, state.CurrentStreet, actorSeat, betAmount, null, null, null));
+                    state.ApplyBet(actorSeat, betAmount, isAllIn: betAmount >= stack);
+                    break;
+                case ActionKind.Raise:
+                    var minRaiseTo = state.GetMinRaiseTo();
+                    var maxRaiseTo = state.GetMaxRaiseTo(actorSeat);
+                    var defaultRaiseTo = Math.Min(minRaiseTo, maxRaiseTo);
+                    var raiseTo = Prompt.AskDecimal($"Raise to amount (min {minRaiseTo}, max {maxRaiseTo})", defaultRaiseTo, min: state.CurrentBet + 0.01m);
+                    if (raiseTo > maxRaiseTo)
+                    {
+                        raiseTo = maxRaiseTo;
+                    }
+                    var raiseContribution = Math.Max(0m, raiseTo - committed);
+                    var isAllInRaise = raiseContribution >= stack;
+                    if (!isAllInRaise && raiseTo < minRaiseTo)
+                    {
+                        Console.WriteLine("Raise must meet min raise or be all-in. Try again.");
+                        continue;
+                    }
+                    events.Add(builder.AddEvent(EventType.RAISE, state.CurrentStreet, actorSeat, raiseContribution, raiseTo, null, null));
+                    state.ApplyRaise(actorSeat, raiseTo, raiseContribution, isAllIn: isAllInRaise);
+                    break;
+                case ActionKind.AllIn:
+                    var allInTo = committed + stack;
+                    if (state.CurrentBet == 0m)
+                    {
+                        events.Add(builder.AddEvent(EventType.ALL_IN, state.CurrentStreet, actorSeat, stack, allInTo, null, null));
+                        state.ApplyBet(actorSeat, stack, isAllIn: true);
+                    }
+                    else if (allInTo <= state.CurrentBet)
+                    {
+                        events.Add(builder.AddEvent(EventType.ALL_IN, state.CurrentStreet, actorSeat, stack, allInTo, null, null));
+                        state.ApplyCall(actorSeat, stack, isAllIn: true);
+                    }
+                    else
+                    {
+                        events.Add(builder.AddEvent(EventType.ALL_IN, state.CurrentStreet, actorSeat, stack, allInTo, null, null));
+                        state.ApplyRaise(actorSeat, allInTo, stack, isAllIn: true);
+                    }
+                    break;
+            }
         }
 
         return events;
+
+        void AddBoardDeal(List<HandEvent> list, HandBuilder hb, Street street)
+        {
+            if (street == Street.FLOP)
+            {
+                var flop = Prompt.AskCards("Flop cards", 3, 3);
+                list.Add(hb.AddEvent(EventType.DEAL_FLOP, street, null, null, null, flop, null));
+            }
+            else if (street == Street.TURN)
+            {
+                var turn = Prompt.AskCards("Turn card", 1, 1);
+                list.Add(hb.AddEvent(EventType.DEAL_TURN, street, null, null, null, turn, null));
+            }
+            else if (street == Street.RIVER)
+            {
+                var river = Prompt.AskCards("River card", 1, 1);
+                list.Add(hb.AddEvent(EventType.DEAL_RIVER, street, null, null, null, river, null));
+            }
+        }
+    }
+
+    private static string BuildLabel(ActionKind action, NlheGameState state, int seat)
+    {
+        var stack = state.Stacks[seat];
+        var callAmount = Math.Min(state.GetCallAmount(seat), stack);
+        return action switch
+        {
+            ActionKind.Check => "Check",
+            ActionKind.Fold => "Fold",
+            ActionKind.Call => $"Call ({callAmount})",
+            ActionKind.Bet => $"Bet (min {state.BigBlind})",
+            ActionKind.Raise => "Raise",
+            ActionKind.AllIn => $"All-in ({stack})",
+            _ => action.ToString()
+        };
     }
 }
 
@@ -641,3 +632,12 @@ static class Config
         return ".local/railbird.db";
     }
 }
+
+
+
+
+
+
+
+
+
