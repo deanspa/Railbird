@@ -1,4 +1,4 @@
-﻿# Railbird Summary
+# Railbird Summary
 
 ## What It Does
 Railbird is a local-only MVP that:
@@ -43,6 +43,15 @@ dotnet run --project src/Railbird.Cli -- list
 dotnet run --project src/Railbird.HandRecorder
 ```
 
+## Hand ID Format
+The hand recorder defaults to: `rb-v1-YYYYMMDD-HHMMSS-fff` (UTC timestamp-based).
+
+
+## PHH Converter
+Use the PHH-to-HRS converter to build a baseline dataset from PHH files:
+```bash
+dotnet run --project src/Railbird.Tools -- phh-to-hrs --input examples/phh/baseline --output examples/hands/v1/baseline --currency GBP
+```
 ## Data Storage
 - Default SQLite file: `.local/railbird.db`
 - Configure via `src/Railbird.Cli/appsettings.json` using the `ConnectionStrings:RailbirdDb` value.
@@ -54,3 +63,5 @@ dotnet run --project src/Railbird.HandRecorder
 - SQLite storage: `src/Railbird.Storage/`
 - CLI: `src/Railbird.Cli/`
 - Tests: `src/Railbird.Core.Tests/`
+
+

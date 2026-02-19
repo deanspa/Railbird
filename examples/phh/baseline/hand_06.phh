@@ -1,0 +1,28 @@
+variant = "NT"
+antes = [0, 0, 0, 0, 0]
+blinds_or_straddles = [1, 2, 0, 0, 0]
+min_bet = 2
+starting_stacks = [100, 100, 100, 100, 100]
+actions = [
+  "d dh p1 AcAd",
+  "d dh p2 KcKh",
+  "d dh p3 QsQd",
+  "d dh p4 JhTh",
+  "d dh p5 9s8s",
+  "p4 cbr 5",
+  "p5 f",
+  "p1 cc",
+  "p2 f",
+  "p3 cc",
+  "d db 2d3d7h",
+  "p1 cc",
+  "p3 cc",
+  "p4 cc",
+  "d db 8d",
+  "p1 cbr 12",
+  "p3 cc",
+  "p4 f",
+  "d db Qh",
+  "p1 cc",
+  "p3 cc"
+]
