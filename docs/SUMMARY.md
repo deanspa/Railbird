@@ -38,6 +38,11 @@ dotnet run --project src/Railbird.Cli -- import-examples
 dotnet run --project src/Railbird.Cli -- list
 ```
 
+### Generate A Hand Interactively
+```bash
+dotnet run --project src/Railbird.HandRecorder
+```
+
 ## Data Storage
 - Default SQLite file: `.local/railbird.db`
 - Configure via `src/Railbird.Cli/appsettings.json` using the `ConnectionStrings:RailbirdDb` value.
