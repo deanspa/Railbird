@@ -22,3 +22,4 @@ dotnet run --project src/Railbird.Cli -- list
 
 ## Repo Structure
 See `docs/specs/hrs/v1/` for the canonical HRS spec and schema.
+See `docs/SUMMARY.md` for a full run/how-it-works summary.
