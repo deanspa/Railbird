@@ -1,0 +1,268 @@
+{
+  "hand_id": "v1-hand-0003",
+  "game": "NLHE",
+  "max_seats": 6,
+  "timestamp_utc": "2026-02-19T11:12:00Z",
+  "stakes": {
+    "small_blind": 1.0,
+    "big_blind": 2.0,
+    "currency": "USD"
+  },
+  "button_seat": 1,
+  "players": [
+    {
+      "seat_no": 1,
+      "player_id": "P1",
+      "display_name": "HERO",
+      "starting_stack": 200.0,
+      "is_hero": true
+    },
+    {
+      "seat_no": 2,
+      "player_id": "P2",
+      "display_name": "SB_SHORT",
+      "starting_stack": 30.0,
+      "is_hero": false
+    },
+    {
+      "seat_no": 3,
+      "player_id": "P3",
+      "display_name": "BB",
+      "starting_stack": 120.0,
+      "is_hero": false
+    },
+    {
+      "seat_no": 4,
+      "player_id": "P4",
+      "display_name": "UTG_SHORT",
+      "starting_stack": 40.0,
+      "is_hero": false
+    }
+  ],
+  "events": [
+    {
+      "seq": 1,
+      "street": "PREFLOP",
+      "type": "POST_SB",
+      "actor_seat": 2,
+      "amount": 1.0,
+      "pot_after": 1.0,
+      "actor_stack_after": 29.0
+    },
+    {
+      "seq": 2,
+      "street": "PREFLOP",
+      "type": "POST_BB",
+      "actor_seat": 3,
+      "amount": 2.0,
+      "pot_after": 3.0,
+      "actor_stack_after": 118.0
+    },
+    {
+      "seq": 3,
+      "street": "PREFLOP",
+      "type": "DEAL_HOLE",
+      "actor_seat": 1,
+      "cards": [
+        "Ah",
+        "Kh"
+      ],
+      "amount": null,
+      "pot_after": 3.0,
+      "actor_stack_after": 200.0
+    },
+    {
+      "seq": 4,
+      "street": "PREFLOP",
+      "type": "ALL_IN",
+      "actor_seat": 4,
+      "amount": 40.0,
+      "to_amount": 40.0,
+      "pot_after": 43.0,
+      "actor_stack_after": 0.0,
+      "note": "UTG all-in to 40"
+    },
+    {
+      "seq": 5,
+      "street": "PREFLOP",
+      "type": "CALL",
+      "actor_seat": 1,
+      "amount": 40.0,
+      "pot_after": 83.0,
+      "actor_stack_after": 160.0
+    },
+    {
+      "seq": 6,
+      "street": "PREFLOP",
+      "type": "ALL_IN",
+      "actor_seat": 2,
+      "amount": 29.0,
+      "to_amount": 30.0,
+      "pot_after": 112.0,
+      "actor_stack_after": 0.0,
+      "note": "SB all-in short (total 30 including SB post)"
+    },
+    {
+      "seq": 7,
+      "street": "PREFLOP",
+      "type": "CALL",
+      "actor_seat": 3,
+      "amount": 38.0,
+      "pot_after": 150.0,
+      "actor_stack_after": 80.0
+    },
+    {
+      "seq": 8,
+      "street": "FLOP",
+      "type": "DEAL_FLOP",
+      "actor_seat": null,
+      "cards": [
+        "Qh",
+        "9c",
+        "3d"
+      ],
+      "amount": null,
+      "pot_after": 150.0
+    },
+    {
+      "seq": 9,
+      "street": "FLOP",
+      "type": "CHECK",
+      "actor_seat": 3,
+      "amount": null,
+      "pot_after": 150.0,
+      "actor_stack_after": 80.0
+    },
+    {
+      "seq": 10,
+      "street": "FLOP",
+      "type": "BET",
+      "actor_seat": 1,
+      "amount": 60.0,
+      "pot_after": 210.0,
+      "actor_stack_after": 100.0
+    },
+    {
+      "seq": 11,
+      "street": "FLOP",
+      "type": "CALL",
+      "actor_seat": 3,
+      "amount": 60.0,
+      "pot_after": 270.0,
+      "actor_stack_after": 20.0
+    },
+    {
+      "seq": 12,
+      "street": "TURN",
+      "type": "DEAL_TURN",
+      "actor_seat": null,
+      "cards": [
+        "2h"
+      ],
+      "amount": null,
+      "pot_after": 270.0
+    },
+    {
+      "seq": 13,
+      "street": "TURN",
+      "type": "ALL_IN",
+      "actor_seat": 3,
+      "amount": 20.0,
+      "to_amount": 20.0,
+      "pot_after": 290.0,
+      "actor_stack_after": 0.0
+    },
+    {
+      "seq": 14,
+      "street": "TURN",
+      "type": "CALL",
+      "actor_seat": 1,
+      "amount": 20.0,
+      "pot_after": 310.0,
+      "actor_stack_after": 80.0
+    },
+    {
+      "seq": 15,
+      "street": "RIVER",
+      "type": "DEAL_RIVER",
+      "actor_seat": null,
+      "cards": [
+        "7s"
+      ],
+      "amount": null,
+      "pot_after": 310.0
+    }
+  ],
+  "outcome": {
+    "rake": 0.0,
+    "shown_cards": [
+      {
+        "seat_no": 1,
+        "cards": [
+          "Ah",
+          "Kh"
+        ]
+      },
+      {
+        "seat_no": 4,
+        "cards": [
+          "Qd",
+          "Qs"
+        ]
+      },
+      {
+        "seat_no": 3,
+        "cards": [
+          "Ad",
+          "Jd"
+        ]
+      },
+      {
+        "seat_no": 2,
+        "cards": [
+          "8c",
+          "8d"
+        ]
+      }
+    ],
+    "pots": [
+      {
+        "amount": 120.0,
+        "eligible_seats": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "winner_seats": [
+          4
+        ],
+        "note": "Main pot (SB capped at 30)"
+      },
+      {
+        "amount": 30.0,
+        "eligible_seats": [
+          1,
+          3,
+          4
+        ],
+        "winner_seats": [
+          4
+        ],
+        "note": "Side pot 1 (UTG extra 10 over SB cap)"
+      },
+      {
+        "amount": 160.0,
+        "eligible_seats": [
+          1,
+          3
+        ],
+        "winner_seats": [
+          1
+        ],
+        "note": "Side pot 2 (postflop betting between Hero and BB)"
+      }
+    ],
+    "hero_net": 40.0
+  }
+}
