@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dp-core.local/schemas/poker/hand-recording-standard.v1.schema.json",
+  "title": "Hand Recording Standard (HRS) - NLHE 6-Max - v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["hand_id", "game", "max_seats", "timestamp_utc", "stakes", "button_seat", "players", "events"],
+  "properties": {
+    "hand_id": { "type": "string", "minLength": 1 },
+    "game": { "type": "string", "enum": ["NLHE"] },
+    "max_seats": { "type": "integer", "enum": [6] },
+
+    "timestamp_utc": { "type": "string", "format": "date-time" },
+
+    "table_name": { "type": "string" },
+
+    "stakes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["small_blind", "big_blind", "currency"],
+      "properties": {
+        "small_blind": { "type": "number", "exclusiveMinimum": 0 },
+        "big_blind": { "type": "number", "exclusiveMinimum": 0 },
+        "currency": { "type": "string", "minLength": 1 }
+      }
+    },
+
+    "button_seat": { "type": "integer", "minimum": 1, "maximum": 6 },
+
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "provider": { "type": "string" },
+        "raw_hand_history": { "type": "string" }
+      }
+    },
+
+    "players": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 6,
+      "items": { "$ref": "#/$defs/player" }
+    },
+
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/event" }
+    },
+
+    "outcome": { "$ref": "#/$defs/outcome" }
+  },
+
+  "$defs": {
+    "player": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["seat_no", "player_id", "starting_stack", "is_hero"],
+      "properties": {
+        "seat_no": { "type": "integer", "minimum": 1, "maximum": 6 },
+        "player_id": { "type": "string", "minLength": 1 },
+        "display_name": { "type": "string" },
+        "starting_stack": { "type": "number", "minimum": 0 },
+        "is_hero": { "type": "boolean" }
+      }
+    },
+
+    "street": {
+      "type": "string",
+      "enum": ["PREFLOP", "FLOP", "TURN", "RIVER", "SHOWDOWN", "SUMMARY"]
+    },
+
+    "eventType": {
+      "type": "string",
+      "enum": [
+        "POST_SB",
+        "POST_BB",
+        "POST_ANTE",
+        "DEAL_HOLE",
+        "DEAL_FLOP",
+        "DEAL_TURN",
+        "DEAL_RIVER",
+        "FOLD",
+        "CHECK",
+        "CALL",
+        "BET",
+        "RAISE",
+        "ALL_IN"
+      ]
+    },
+
+    "card": {
+      "type": "string",
+      "pattern": "^(?:[AKQJT98765432][shdc])$"
+    },
+
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["seq", "street", "type"],
+      "properties": {
+        "seq": { "type": "integer", "minimum": 1 },
+        "street": { "$ref": "#/$defs/street" },
+        "type": { "$ref": "#/$defs/eventType" },
+
+        "actor_seat": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "maximum": 6
+        },
+
+        "amount": { "type": ["number", "null"], "minimum": 0 },
+        "to_amount": { "type": ["number", "null"], "minimum": 0 },
+
+        "cards": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/card" },
+          "minItems": 1,
+          "maxItems": 5
+        },
+
+        "pot_after": { "type": ["number", "null"], "minimum": 0 },
+        "actor_stack_after": { "type": ["number", "null"], "minimum": 0 },
+
+        "note": { "type": "string" }
+      },
+
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "RAISE" } }, "required": ["type"] },
+          "then": { "required": ["to_amount"] }
+        },
+        {
+          "if": { "properties": { "type": { "enum": ["DEAL_HOLE", "DEAL_FLOP", "DEAL_TURN", "DEAL_RIVER"] } }, "required": ["type"] },
+          "then": { "required": ["cards"] }
+        }
+      ]
+    },
+
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rake": { "type": "number", "minimum": 0 },
+        "pots": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/pot" }
+        },
+        "hero_net": { "type": "number" },
+        "shown_cards": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/shownCard" }
+        }
+      }
+    },
+
+    "pot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "eligible_seats", "winner_seats"],
+      "properties": {
+        "amount": { "type": "number", "minimum": 0 },
+        "eligible_seats": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "integer", "minimum": 1, "maximum": 6 }
+        },
+        "winner_seats": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "integer", "minimum": 1, "maximum": 6 }
+        },
+        "note": { "type": "string" }
+      }
+    },
+
+    "shownCard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["seat_no", "cards"],
+      "properties": {
+        "seat_no": { "type": "integer", "minimum": 1, "maximum": 6 },
+        "cards": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": { "$ref": "#/$defs/card" }
+        }
+      }
+    }
+  }
+}

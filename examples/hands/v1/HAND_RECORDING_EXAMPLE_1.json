@@ -1,0 +1,137 @@
+{
+  "hand_id": "v1-hand-0001",
+  "game": "NLHE",
+  "max_seats": 6,
+  "timestamp_utc": "2026-02-19T11:00:00Z",
+  "stakes": {
+    "small_blind": 0.5,
+    "big_blind": 1.0,
+    "currency": "USD"
+  },
+  "button_seat": 1,
+  "players": [
+    {
+      "seat_no": 1,
+      "player_id": "P1",
+      "display_name": "HERO",
+      "starting_stack": 100.0,
+      "is_hero": true
+    },
+    {
+      "seat_no": 2,
+      "player_id": "P2",
+      "display_name": "VILLAIN",
+      "starting_stack": 100.0,
+      "is_hero": false
+    }
+  ],
+  "events": [
+    {
+      "seq": 1,
+      "street": "PREFLOP",
+      "type": "POST_SB",
+      "actor_seat": 1,
+      "amount": 0.5,
+      "pot_after": 0.5,
+      "actor_stack_after": 99.5
+    },
+    {
+      "seq": 2,
+      "street": "PREFLOP",
+      "type": "POST_BB",
+      "actor_seat": 2,
+      "amount": 1.0,
+      "pot_after": 1.5,
+      "actor_stack_after": 99.0
+    },
+    {
+      "seq": 3,
+      "street": "PREFLOP",
+      "type": "DEAL_HOLE",
+      "actor_seat": 1,
+      "cards": [
+        "As",
+        "Kd"
+      ],
+      "amount": null,
+      "pot_after": 1.5,
+      "actor_stack_after": 99.5
+    },
+    {
+      "seq": 4,
+      "street": "PREFLOP",
+      "type": "RAISE",
+      "actor_seat": 1,
+      "amount": 2.5,
+      "to_amount": 3.0,
+      "pot_after": 4.0,
+      "actor_stack_after": 97.0
+    },
+    {
+      "seq": 5,
+      "street": "PREFLOP",
+      "type": "CALL",
+      "actor_seat": 2,
+      "amount": 2.0,
+      "pot_after": 6.0,
+      "actor_stack_after": 97.0
+    },
+    {
+      "seq": 6,
+      "street": "FLOP",
+      "type": "DEAL_FLOP",
+      "actor_seat": null,
+      "cards": [
+        "Ah",
+        "7c",
+        "2d"
+      ],
+      "amount": null,
+      "pot_after": 6.0
+    },
+    {
+      "seq": 7,
+      "street": "FLOP",
+      "type": "CHECK",
+      "actor_seat": 2,
+      "amount": null,
+      "pot_after": 6.0,
+      "actor_stack_after": 97.0
+    },
+    {
+      "seq": 8,
+      "street": "FLOP",
+      "type": "BET",
+      "actor_seat": 1,
+      "amount": 4.0,
+      "pot_after": 10.0,
+      "actor_stack_after": 93.0
+    },
+    {
+      "seq": 9,
+      "street": "FLOP",
+      "type": "FOLD",
+      "actor_seat": 2,
+      "amount": null,
+      "pot_after": 10.0,
+      "actor_stack_after": 97.0
+    }
+  ],
+  "outcome": {
+    "rake": 0.0,
+    "pots": [
+      {
+        "amount": 10.0,
+        "eligible_seats": [
+          1,
+          2
+        ],
+        "winner_seats": [
+          1
+        ],
+        "note": "Villain folded on flop"
+      }
+    ],
+    "hero_net": 3.0
+  }
+}
