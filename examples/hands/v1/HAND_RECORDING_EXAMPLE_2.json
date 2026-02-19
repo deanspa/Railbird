@@ -1,0 +1,245 @@
+{
+  "hand_id": "v1-hand-0002",
+  "game": "NLHE",
+  "max_seats": 6,
+  "timestamp_utc": "2026-02-19T11:05:00Z",
+  "stakes": {
+    "small_blind": 0.5,
+    "big_blind": 1.0,
+    "currency": "USD"
+  },
+  "button_seat": 2,
+  "players": [
+    {
+      "seat_no": 1,
+      "player_id": "P1",
+      "display_name": "HERO",
+      "starting_stack": 50.0,
+      "is_hero": true
+    },
+    {
+      "seat_no": 2,
+      "player_id": "P2",
+      "display_name": "BTN",
+      "starting_stack": 50.0,
+      "is_hero": false
+    },
+    {
+      "seat_no": 3,
+      "player_id": "P3",
+      "display_name": "BB",
+      "starting_stack": 50.0,
+      "is_hero": false
+    }
+  ],
+  "events": [
+    {
+      "seq": 1,
+      "street": "PREFLOP",
+      "type": "POST_SB",
+      "actor_seat": 2,
+      "amount": 0.5,
+      "pot_after": 0.5,
+      "actor_stack_after": 49.5
+    },
+    {
+      "seq": 2,
+      "street": "PREFLOP",
+      "type": "POST_BB",
+      "actor_seat": 3,
+      "amount": 1.0,
+      "pot_after": 1.5,
+      "actor_stack_after": 49.0
+    },
+    {
+      "seq": 3,
+      "street": "PREFLOP",
+      "type": "DEAL_HOLE",
+      "actor_seat": 1,
+      "cards": [
+        "Qh",
+        "Qs"
+      ],
+      "amount": null,
+      "pot_after": 1.5,
+      "actor_stack_after": 50.0
+    },
+    {
+      "seq": 4,
+      "street": "PREFLOP",
+      "type": "RAISE",
+      "actor_seat": 1,
+      "amount": 3.0,
+      "to_amount": 3.0,
+      "pot_after": 4.5,
+      "actor_stack_after": 47.0
+    },
+    {
+      "seq": 5,
+      "street": "PREFLOP",
+      "type": "CALL",
+      "actor_seat": 2,
+      "amount": 2.5,
+      "pot_after": 7.0,
+      "actor_stack_after": 47.0
+    },
+    {
+      "seq": 6,
+      "street": "PREFLOP",
+      "type": "CALL",
+      "actor_seat": 3,
+      "amount": 2.0,
+      "pot_after": 9.0,
+      "actor_stack_after": 47.0
+    },
+    {
+      "seq": 7,
+      "street": "FLOP",
+      "type": "DEAL_FLOP",
+      "actor_seat": null,
+      "cards": [
+        "9d",
+        "5s",
+        "2c"
+      ],
+      "amount": null,
+      "pot_after": 9.0
+    },
+    {
+      "seq": 8,
+      "street": "FLOP",
+      "type": "CHECK",
+      "actor_seat": 3,
+      "amount": null,
+      "pot_after": 9.0,
+      "actor_stack_after": 47.0
+    },
+    {
+      "seq": 9,
+      "street": "FLOP",
+      "type": "BET",
+      "actor_seat": 1,
+      "amount": 5.0,
+      "pot_after": 14.0,
+      "actor_stack_after": 42.0
+    },
+    {
+      "seq": 10,
+      "street": "FLOP",
+      "type": "CALL",
+      "actor_seat": 2,
+      "amount": 5.0,
+      "pot_after": 19.0,
+      "actor_stack_after": 42.0
+    },
+    {
+      "seq": 11,
+      "street": "FLOP",
+      "type": "FOLD",
+      "actor_seat": 3,
+      "amount": null,
+      "pot_after": 19.0,
+      "actor_stack_after": 47.0
+    },
+    {
+      "seq": 12,
+      "street": "TURN",
+      "type": "DEAL_TURN",
+      "actor_seat": null,
+      "cards": [
+        "Jc"
+      ],
+      "amount": null,
+      "pot_after": 19.0
+    },
+    {
+      "seq": 13,
+      "street": "TURN",
+      "type": "BET",
+      "actor_seat": 1,
+      "amount": 12.0,
+      "pot_after": 31.0,
+      "actor_stack_after": 30.0
+    },
+    {
+      "seq": 14,
+      "street": "TURN",
+      "type": "CALL",
+      "actor_seat": 2,
+      "amount": 12.0,
+      "pot_after": 43.0,
+      "actor_stack_after": 30.0
+    },
+    {
+      "seq": 15,
+      "street": "RIVER",
+      "type": "DEAL_RIVER",
+      "actor_seat": null,
+      "cards": [
+        "2h"
+      ],
+      "amount": null,
+      "pot_after": 43.0
+    },
+    {
+      "seq": 16,
+      "street": "RIVER",
+      "type": "CHECK",
+      "actor_seat": 1,
+      "amount": null,
+      "pot_after": 43.0,
+      "actor_stack_after": 30.0
+    },
+    {
+      "seq": 17,
+      "street": "RIVER",
+      "type": "BET",
+      "actor_seat": 2,
+      "amount": 20.0,
+      "pot_after": 63.0,
+      "actor_stack_after": 10.0
+    },
+    {
+      "seq": 18,
+      "street": "RIVER",
+      "type": "CALL",
+      "actor_seat": 1,
+      "amount": 20.0,
+      "pot_after": 83.0,
+      "actor_stack_after": 10.0
+    }
+  ],
+  "outcome": {
+    "rake": 0.0,
+    "shown_cards": [
+      {
+        "seat_no": 1,
+        "cards": [
+          "Qh",
+          "Qs"
+        ]
+      },
+      {
+        "seat_no": 2,
+        "cards": [
+          "Ad",
+          "Kd"
+        ]
+      }
+    ],
+    "pots": [
+      {
+        "amount": 83.0,
+        "eligible_seats": [
+          1,
+          2
+        ],
+        "winner_seats": [
+          1
+        ],
+        "note": "Hero wins at showdown"
+      }
+    ],
+    "hero_net": 43.0
+  }
+}
